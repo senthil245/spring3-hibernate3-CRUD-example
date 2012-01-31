@@ -36,29 +36,26 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
 		p:location="/WEB-INF/jdbc.properties" />
 
-	<bean id="dataSource"
-		class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
-		p:driverClassName="${jdbc.driverClassName}"
-		p:url="${jdbc.databaseurl}" p:username="${jdbc.username}"
-		p:password="${jdbc.password}" />
+
+    	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"
+				 p:dataSource-ref="dataSource"
+				 p:configLocation="${hibernate.config}"
+				 p:packagesToScan="net.viralpatel.contact"/>
+
+	<!-- Declare a datasource that has pooling capabilities-->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+				destroy-method="close"
+				p:driverClass="${jdbc.driverClassName}"
+				p:jdbcUrl="${jdbc.databaseurl}"
+				p:user="${jdbc.username}"
+				p:password="${jdbc.password}"
+				p:acquireIncrement="5"
+				p:idleConnectionTestPeriod="60"
+				p:maxPoolSize="100"
+				p:maxStatements="50"
+				p:minPoolSize="10" />
 
 
-	<bean id="sessionFactory"
-		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<property name="configLocation">
-			<value>classpath:hibernate.cfg.xml</value>
-		</property>
-		<property name="configurationClass">
-			<value>org.hibernate.cfg.AnnotationConfiguration</value>
-		</property>
-		<property name="hibernateProperties">
-			<props>
-				<prop key="hibernate.dialect">${jdbc.dialect}</prop>
-				<prop key="hibernate.show_sql">true</prop>
-			</props>
-		</property>
-	</bean>
 
 	<tx:annotation-driven />
 
